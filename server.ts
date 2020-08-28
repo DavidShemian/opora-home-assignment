@@ -1,3 +1,7 @@
+import { handleError } from "./src/middlewares/error-middleware";
+import { DBService } from "./src/services/db-service";
+import { config } from "./src/configs/config";
+import "reflect-metadata";
 import { initLogger } from "./logger";
 import express, { Express } from "express";
 import rateLimit from "express-rate-limit";
@@ -21,15 +25,22 @@ const addHttpLogging = (app: Express) => {
   app.use(morgan("combined"));
 };
 
+const addErrorMiddleware = (app: Express) => {
+  app.use(handleError);
+};
+
 const expressApp: Express = express();
 
 addDdosProtraction(expressApp);
 adjustSecureHeaders(expressApp);
 addHttpLogging(expressApp);
 initLogger();
+DBService.initDB();
 
-const port = process.env.PORT || 3000;
+const port = config.SERVER_PORT;
 
 expressApp.listen(port, () => {
   logger.info(`App is listening on port ${port}!`);
 });
+
+addErrorMiddleware(expressApp);
