@@ -11,7 +11,7 @@
 		"object-literal-sort-keys": false,
 		"only-arrow-functions": true,
 		"no-eval": true,
-		"semicolon": true,
+		"semicolon": [true, "always", "strict-bound-class-methods"],
 		"prefer-array-literal": [true, { "allow-type-parameters": true }],
 		"max-line-length": [
 			true,

@@ -1,10 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 
 export const handleError = (
-  _err: any,
+  err: any,
   _req: Request,
   res: Response,
   _next: NextFunction
 ) => {
-  return res.status(500).end();
+  logger.error("Unexpected Error caught", err);
+
+  return res.status(500).json("Unexpected Error");
 };

@@ -16,7 +16,7 @@ export class DBService {
     this.useSSL = config.DB_USE_SSL;
   }
 
-  public static async getEntityManager(): Promise<EntityManager> {
+  public static getEntityManager(): EntityManager {
     if (!DBService.entityManager) {
       throw new InitializationException(
         InitializationExceptionCodes.DB_NOT_INITIALIZED,
