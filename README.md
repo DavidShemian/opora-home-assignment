@@ -16,12 +16,14 @@ David Shemian solution for Opora home assignment - Back End
     TOKEN_SECRET_KEY=$123mytokensercretkey!%
     TOKEN_EXPIRES_TIME=3d
     SERVER_PORT=6500
-    DB_CONNECTION_STRING=postgres://postgres@localhost:5432/f1_db
+    DB_CONNECTION_STRING=postgres://username:password@localhost:5432/dbname
     DB_USE_SSL=false
     DB_SHOULD_LOG=true
 
 3. Insert the data to the DB, including creating the drivers avatar column using Wikipedia query API by 
     adding the PostgreSQL compatible MySQL database dump from https://ergast.com/mrd/db/ into the root folder and then run ### `npm build-db`. Afterwards the dump file is not needed.
+
+4. Run script using `npm run production`
 
 ## Available Scripts
 

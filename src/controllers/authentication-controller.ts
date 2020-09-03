@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import { userAuthenticationMiddleware } from '../middlewares/user-authentication-middleware';
 import { ErrorCodes, ResponseService, SuccessCodes } from '../services/response-service';
 import { AuthenticationException, AuthenticationExceptionCodes } from './../exceptions/authentication-exception';
 import { AuthenticationService } from './../services/authentication-service';
@@ -23,7 +22,7 @@ export class AuthenticationController extends BaseController {
     }
 
     private initializeRoutes(): void {
-        this._router.post(`${this.path}/register`, userAuthenticationMiddleware, this.register);
+        this._router.post(`${this.path}/register`, this.register);
         this._router.post(`${this.path}/login`, this.login);
     }
 

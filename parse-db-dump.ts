@@ -62,13 +62,15 @@ fs.readFile('./f1db_postgres.sql', 'utf8', async (err: Error, content: string) =
     logger.info('Adds missing avatar column to drivers');
 
     try {
-        logger.info(`STARTING TO RUN THE SCRIPT ON POSTGRES DB WITH CONNECTION STRING: ${config.DB_CONNECTION_STRING}`);
+        logger.info(`STARTING TO RUN DUMP ON POSTGRES DB`);
 
         await DBService.getEntityManager().query(content.toString());
 
-        logger.info('FINISH LOADING DATA TO POSTGRES DB');
+        logger.info('FINISHED LOADING DATA TO POSTGRES DB');
 
         await addAvatarToDrivers();
+
+        logger.info(`FINISH BUILDING DB`);
 
         process.exit(0);
     } catch (error) {

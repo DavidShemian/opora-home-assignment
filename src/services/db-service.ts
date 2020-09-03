@@ -49,7 +49,7 @@ export class DBService {
             url: this.connectionString,
             ssl: this.useSSL,
             synchronize: true,
-            logging: true,
+            logging: config.DB_SHOULD_LOG === 'true',
             entities: [path.resolve('dist', 'src/models/db-models/**/*.js')],
         };
 
