@@ -1,20 +1,24 @@
-import { selectMillisecondsAsMinutesText } from "./dal-utils";
-import { BaseDal } from "./base-dal";
+import { ICurrentSeasonDriver } from './../models/interfaces/current-season-driver';
+import { IDriverRace } from './../models/interfaces/driver-race';
+import { BaseDal } from './base-dal';
+import { selectMillisecondsAsMinutesText } from './dal-utils';
 
 export class DriverDal extends BaseDal {
-  /**
-   * Returns list of current season drivers with standings stats
-   * sorted by the number of wins, from top to button
-   */
-  public async getCurrentSessionDriversSortedByWins() {
-    return this.entityManager.query(`
+    /**
+     * Returns list of current season drivers with standings stats
+     * sorted by the number of wins, from top to button
+     */
+    public async getCurrentSessionDriversSortedByWins(): Promise<ICurrentSeasonDriver[]> {
+        return this.entityManager.query(`
             select
             driver_standings."driverId",
             driver_standings."raceId",
             driver_standings.points,
+            driver_standings.wins,
             driver_standings."position",
             CONCAT(drivers.forename, ' ', drivers.surname) as name,
-            drivers.nationality
+            drivers.nationality,
+            drivers.avatar
         from
             "driverStandings" driver_standings
         inner join drivers on
@@ -30,29 +34,23 @@ export class DriverDal extends BaseDal {
                 and date_part('year', r.date) = date_part('year', CURRENT_DATE))
         order by driver_standings.wins desc;
         `);
-  }
+    }
 
-  /**
-   * Returns list of all driver's races, with lap, pit stops and circuit infos
-   * sorted by race date from most recent to last
-   */
-  public async getDriverRaces(driverId: number) {
-    return this.entityManager.query(
-      `
+    /**
+     * Returns list of all driver's races, with lap, pit stops and circuit infos
+     * sorted by race date from most recent to last
+     */
+    public async getDriverRaces(driverId: number): Promise<IDriverRace[]> {
+        return this.entityManager.query(
+            `
             select
             lap_times."raceId",
             max(lap_times.time) as "slowestLapTime",
             min(lap_times.time) as "fastestLapTime",
-            ${selectMillisecondsAsMinutesText(
-              "avg(lap_times.milliseconds)"
-            )} as "averageLapTime",
+            ${selectMillisecondsAsMinutesText('avg(lap_times.milliseconds)')} as "averageLapTime",
             max(ps.stop) as "numOfPitStops",
-            ${selectMillisecondsAsMinutesText(
-              "min(ps.milliseconds)"
-            )} as "fastestPitStop",
-            ${selectMillisecondsAsMinutesText(
-              "max(ps.milliseconds)"
-            )} as "slowestPitStop",
+            ${selectMillisecondsAsMinutesText('min(ps.milliseconds)')} as "fastestPitStop",
+            ${selectMillisecondsAsMinutesText('max(ps.milliseconds)')} as "slowestPitStop",
             circuits."name" as "circuitName",
             results.points as "points",
             results."position" as "position"
@@ -69,7 +67,7 @@ export class DriverDal extends BaseDal {
             lap_times."raceId", races."name", races."date", circuits.name, results.points, results.position
         order by races."date" desc;
         `,
-      [driverId]
-    );
-  }
+            [driverId]
+        );
+    }
 }
