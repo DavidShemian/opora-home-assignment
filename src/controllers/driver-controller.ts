@@ -1,5 +1,6 @@
-import { DriverService } from './../services/driver-service';
-import { Router, Response, Request, NextFunction } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
+import { DriverService } from '../services/driver-service';
+import { ResponseService, SuccessCodes } from '../services/response-service';
 
 export class DriverController {
     get router(): Router {
@@ -20,24 +21,23 @@ export class DriverController {
         try {
             const drivers = await this.driverService.getCurrentSessionDriversSortedByWins();
             response.status(200).json(drivers);
-        } catch (e) {
-            next(e);
+        } catch (error) {
+            next(error);
         }
     };
 
     private getDriverRaces = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const { driverId } = request.params;
-
             const drivers = await this.driverService.getDriverRaces(+driverId);
 
-            response.status(200).json(drivers);
-        } catch (e) {
-            next(e);
+            return ResponseService.responseSuccess(response, SuccessCodes.OK, { drivers });
+        } catch (error) {
+            next(error);
         }
     };
 
-    private initializeRoutes() {
+    private initializeRoutes(): void {
         this._router.get(`${this.path}/current-season`, this.getCurrentSessionDriversSortedByWins);
         this._router.get(`${this.path}/:driverId(\\d+)/races`, this.getDriverRaces);
     }

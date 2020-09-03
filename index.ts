@@ -1,5 +1,4 @@
-import { App } from "./app";
+import { App } from './app';
 
-const app = new App();
-
-app.listen();
+// tslint:disable-next-line: no-unused-expression
+new App();

@@ -1,74 +1,82 @@
-import { DriverController } from "./src/controllers/driver-controlle";
-import { handleError } from "./src/middlewares/error-middleware";
-import { DBService } from "./src/services/db-service";
-import { config } from "./src/configs/config";
-import "reflect-metadata";
-import { initLogger } from "./logger";
-import express, { Express } from "express";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
-import morgan from "morgan";
-import cors from "cors";
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import express, { Express } from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import 'reflect-metadata';
+import { initLogger } from './logger';
+import { config } from './src/configs/config';
+import { AuthenticationController } from './src/controllers/authentication-controller';
+import { DriverController } from './src/controllers/driver-controller';
+import { handleError } from './src/middlewares/error-middleware';
+import { DBService } from './src/services/db-service';
 
 export class App {
-  private app: Express;
+    private app: Express;
 
-  constructor() {
-    this.app = express();
+    constructor() {
+        this.app = express();
 
-    this.initApp();
-  }
+        this.initApp();
+    }
 
-  public listen() {
-    const port = config.SERVER_PORT;
+    public listen(): void {
+        const port = config.SERVER_PORT;
 
-    this.app.listen(port, () => {
-      logger.info(`App is listening on port ${port}!`);
-    });
-  }
+        this.app.listen(port, () => {
+            logger.info(`App is listening on port ${port}!`);
+        });
+    }
 
-  private addDDOSProtraction() {
-    const limiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP to 100 requests per windowMs
-    });
+    private addBodyParser(): void {
+        this.app.use(bodyParser.json());
+    }
 
-    this.app.use(limiter);
-  }
+    private addDDOSProtraction(): void {
+        const limiter = rateLimit({
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: 100, // limit each IP to 100 requests per windowMs
+        });
 
-  private addErrorMiddleware() {
-    this.app.use(handleError);
-  }
+        this.app.use(limiter);
+    }
 
-  private addHttpLogging() {
-    this.app.use(morgan("combined"));
-  }
+    private addErrorMiddleware(): void {
+        this.app.use(handleError);
+    }
 
-  private adjustSecureHeaders() {
-    this.app.use(helmet());
-  }
+    private addHttpLogging(): void {
+        this.app.use(morgan('combined'));
+    }
 
-  private EnableCORS() {
-    this.app.use(cors({ origin: [/localhost/i] }));
-  }
+    private adjustSecureHeaders(): void {
+        this.app.use(helmet());
+    }
 
-  private async initApp() {
-    initLogger();
-    await DBService.initDB();
-    this.EnableCORS();
-    this.addDDOSProtraction();
-    this.adjustSecureHeaders();
-    this.addHttpLogging();
-    this.initializeControllers();
-    this.addErrorMiddleware();
-  }
+    private EnableCORS(): void {
+        this.app.use(cors({ origin: [/localhost/i] }));
+    }
 
-  private initializeControllers() {
-    const router = express.Router();
-    const controllers = [new DriverController(router)];
+    private async initApp(): Promise<void> {
+        initLogger();
+        await DBService.initDB();
+        this.EnableCORS();
+        this.addBodyParser();
+        this.addDDOSProtraction();
+        this.adjustSecureHeaders();
+        this.addHttpLogging();
+        this.initializeControllers();
+        this.addErrorMiddleware();
+        this.listen();
+    }
 
-    controllers.forEach((controller) => {
-      this.app.use("/", controller.router);
-    });
-  }
+    private initializeControllers(): void {
+        const router = express.Router();
+        const controllers = [new DriverController(router), new AuthenticationController(router)];
+
+        controllers.forEach((controller) => {
+            this.app.use('/', controller.router);
+        });
+    }
 }

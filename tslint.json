@@ -1,6 +1,6 @@
 {
     "defaultSeverity": "error",
-    "extends": ["tslint:recommended", "tslint-config-security", "tslint-config-prettier"],
+    "extends": ["tslint:recommended", "tslint-config-prettier"],
     "jsRules": {},
     "rules": {
         "variable-name": [true, "check-format", "allow-leading-underscore"],
@@ -10,9 +10,11 @@
         "no-boolean-literal-compare": true,
         "object-literal-sort-keys": false,
         "only-arrow-functions": true,
+        "ordered-imports": true,
         "no-eval": true,
         "semicolon": [true, "always", "strict-bound-class-methods"],
         "prefer-array-literal": [true, { "allow-type-parameters": true }],
+        "typedef": [true, "call-signature", "property-declaration"],
         "max-line-length": [
             true,
             {
